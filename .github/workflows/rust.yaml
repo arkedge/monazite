@@ -63,7 +63,7 @@ jobs:
         run: cargo fmt -- --check
 
       - name: reviewdog / clippy
-        uses: sksat/action-clippy@v0.7.1
+        uses: sksat/action-clippy@v1.1.1
         with:
           working_directory: ${{ matrix.workspace }}
 

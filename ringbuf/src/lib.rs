@@ -57,9 +57,9 @@ impl<'a> RingBuf<'a> {
     #[must_use]
     pub fn readable(&self) -> (&[u8], &[u8]) {
         if self.is_empty() {
-            (&[], &[])
+            (&self.buffer[..0], &self.buffer[..0])
         } else if self.front < self.back {
-            (&self.buffer[self.front..self.back], &[])
+            (&self.buffer[self.front..self.back], &self.buffer[..0])
         } else {
             (&self.buffer[self.front..], &self.buffer[..self.back])
         }

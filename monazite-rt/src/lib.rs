@@ -400,6 +400,8 @@ fn init_wdt(res: resources::Wdt) {
 fn init_ramecc(res: resources::Ramecc) -> ramecc::RamScrubber {
     #[link_section = ".sram1.eccbuf"]
     static mut ECC_DST_BUFFER: MaybeUninit<[u32; 1]> = MaybeUninit::uninit();
+    // This buf is not referenced by multiple sources simultaneously.
+    #[allow(static_mut_refs)]
     let ecc_dst_buf = unsafe { ECC_DST_BUFFER.write([0; 1]) };
 
     let ecc_stats = singleton!(: ramecc::EccStats = ramecc::EccStats::default()).unwrap();
@@ -429,6 +431,8 @@ fn init_iflash(res: resources::Iflash) -> &'static iflash::Iflash {
     #[no_mangle]
     #[link_section = ".sram1.iflashbuf"]
     static mut IFLASH_BUF: MaybeUninit<[u8; 128]> = MaybeUninit::uninit();
+    // singleton! guarantees that only one instance can reference at a time.
+    #[allow(static_mut_refs)]
     let iflash_buf = unsafe { IFLASH_BUF.write([0; 128]) };
 
     let iflash = iflash::Iflash::new(res.flash, iflash_buf);
@@ -470,6 +474,8 @@ fn init_adc(res: resources::Adc, shared: &mut resources::Shared) {
     #[link_section = ".sram1.adcbuf"]
     static mut ADC_BUFFER: MaybeUninit<[u16; crate::adc::TOTAL_CHANNEL_NUM]> =
         MaybeUninit::uninit();
+    // singleton! guarantees that only one instance can reference at a time.
+    #[allow(static_mut_refs)]
     let adc_buf = unsafe { ADC_BUFFER.write([0; crate::adc::TOTAL_CHANNEL_NUM]) };
     let adc2 = hal::adc::Adc::adc2(
         res.adc2,
@@ -498,6 +504,8 @@ fn init_thermometer(res: resources::Thermometer, shared: &mut resources::Shared)
     // adc3 for thermometer
     #[link_section = ".sram1.thermobuf"]
     static mut THERMO_BUFFER: MaybeUninit<[u16; 1]> = MaybeUninit::uninit();
+    // singleton! guarantees that only one instance can reference at a time.
+    #[allow(static_mut_refs)]
     let buf = unsafe { THERMO_BUFFER.write([0; 1]) };
     let adc3 = hal::adc::Adc::adc3(
         res.adc3,

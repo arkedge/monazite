@@ -32,13 +32,17 @@ unsafe impl defmt::Logger for Logger {
         INTERRUPTS_ACTIVE.store(primask.is_active(), Ordering::Relaxed);
 
         // safety: accessing the `static mut` is OK because we have disabled interrupts.
-        unsafe { ENCODER.start_frame(do_write) }
+        #[allow(static_mut_refs)]
+        unsafe {
+            ENCODER.start_frame(do_write);
+        }
     }
 
     unsafe fn flush() {}
 
     unsafe fn release() {
         // safety: accessing the `static mut` is OK because we have disabled interrupts.
+        #[allow(static_mut_refs)]
         ENCODER.end_frame(do_write);
 
         TAKEN.store(false, Ordering::Relaxed);
@@ -50,12 +54,14 @@ unsafe impl defmt::Logger for Logger {
 
     unsafe fn write(bytes: &[u8]) {
         // safety: accessing the `static mut` is OK because we have disabled interrupts.
+        #[allow(static_mut_refs)]
         ENCODER.write(bytes, do_write);
     }
 }
 
 fn do_write(bytes: &[u8]) {
     unsafe {
+        #[allow(static_mut_refs)]
         if let Some(c) = &mut CHANNEL {
             c.write(bytes);
         }

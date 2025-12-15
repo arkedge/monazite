@@ -46,7 +46,7 @@ where
         let dma_config = DmaConfig::default()
             .memory_increment(false)
             .circular_buffer(true);
-        let dma_buf = unsafe { core::slice::from_raw_parts_mut(buf as *mut u16, buf.len()) };
+        let dma_buf = unsafe { core::slice::from_raw_parts_mut(buf.as_mut_ptr(), buf.len()) };
         let mut transfer: Transfer<_, _, _, _, _> =
             Transfer::init(dma_stream, adc, dma_buf, None, dma_config);
 

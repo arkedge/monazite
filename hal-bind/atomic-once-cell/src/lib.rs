@@ -40,7 +40,13 @@ impl<T> AtomicOnceCell<T> {
 
     pub fn set<'a>(&'a self, new: &'a T) -> &'a T {
         self.ptr
-            .store((new as *const T).cast_mut(), Ordering::SeqCst);
+            .store(core::ptr::from_ref::<T>(new).cast_mut(), Ordering::SeqCst);
         new
+    }
+}
+
+impl<T> Default for AtomicOnceCell<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
